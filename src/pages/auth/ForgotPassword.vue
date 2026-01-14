@@ -39,13 +39,14 @@
     </form>
 
     <div class="auth-links">
-      <router-link to="/" class="auth-link">Back to Login</router-link>
+      <router-link to="/auth/login" class="auth-link">Back to Login</router-link>
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, reactive } from 'vue'
+import { supabase } from '../../lib/supabaseClient.js'
 
 const formData = reactive({
   email: ''
@@ -75,29 +76,23 @@ const handleForgotPassword = async () => {
   loading.value = true
 
   try {
-    const response = await mockForgotPassword(formData.email)
-    if (response.success) {
-      successMessage.value = 'Password reset link has been sent to your email!'
-      formData.email = ''
-    } else {
-      errorMessage.value = response.message || 'Failed to send reset link. Please try again.'
+    const { error } = await supabase.auth.resetPasswordForEmail(formData.email, {
+      redirectTo: `${window.location.origin}/auth/reset-password`
+    })
+    
+    if (error) {
+      errorMessage.value = error.message || 'Failed to send reset link. Please try again.'
+      return
     }
+    
+    successMessage.value = 'Password reset link has been sent to your email!'
+    formData.email = ''
   } catch (error) {
     errorMessage.value = error.message || 'An error occurred. Please try again.'
+    console.error('Forgot password error:', error)
   } finally {
     loading.value = false
   }
-}
-
-const mockForgotPassword = (email) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        success: true,
-        message: 'Reset link sent'
-      })
-    }, 1000)
-  })
 }
 </script>
 

@@ -13,24 +13,51 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { supabase } from '../../lib/supabaseClient.js'
 
 const router = useRouter()
 const user = ref(null)
 
-onMounted(() => {
-  const userData = localStorage.getItem('user')
-  if (userData) {
-    user.value = JSON.parse(userData)
+onMounted(async () => {
+  // Check current session
+  const { data: { session } } = await supabase.auth.getSession()
+  
+  if (session?.user) {
+    user.value = {
+      email: session.user.email,
+      name: session.user.user_metadata?.full_name || 
+            session.user.user_metadata?.name || 
+            session.user.user_metadata?.display_name ||
+            session.user.email?.split('@')[0] ||
+            session.user.email,
+      id: session.user.id
+    }
   } else {
     // Redirect to login if not authenticated
-    router.push('/')
+    router.push('/auth/login')
   }
+  
+  // Listen for auth state changes
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_OUT' || !session) {
+      router.push('/auth/login')
+    } else if (session?.user) {
+      user.value = {
+        email: session.user.email,
+        name: session.user.user_metadata?.full_name || 
+              session.user.user_metadata?.name || 
+              session.user.user_metadata?.display_name ||
+              session.user.email?.split('@')[0] ||
+              session.user.email,
+        id: session.user.id
+      }
+    }
+  })
 })
 
-const handleLogout = () => {
-  localStorage.removeItem('authToken')
-  localStorage.removeItem('user')
-  router.push('/')
+const handleLogout = async () => {
+  await supabase.auth.signOut()
+  router.push('/auth/login')
 }
 </script>
 

@@ -19,16 +19,34 @@
 
       <div class="form-group">
         <label for="password">Password</label>
-        <input
-          id="password"
-          v-model="formData.password"
-          type="password"
-          placeholder="Enter your password"
-          required
-          :disabled="loading"
-          class="form-input"
-          :class="{ 'error': errors.password }"
-        />
+        <div class="password-input-wrapper">
+          <input
+            id="password"
+            v-model="formData.password"
+            :type="showPassword ? 'text' : 'password'"
+            placeholder="Enter your password"
+            required
+            :disabled="loading"
+            class="form-input"
+            :class="{ 'error': errors.password }"
+          />
+          <button
+            type="button"
+            @click="showPassword = !showPassword"
+            class="password-toggle"
+            :disabled="loading"
+            tabindex="-1"
+          >
+            <svg v-if="showPassword" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+              <line x1="1" y1="1" x2="23" y2="23"></line>
+            </svg>
+            <svg v-else xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          </button>
+        </div>
         <span v-if="errors.password" class="error-message">{{ errors.password }}</span>
       </div>
 
@@ -47,9 +65,27 @@
       </button>
     </form>
 
+    <div class="divider">
+      <span>OR</span>
+    </div>
+
+    <button
+      @click="handleGoogleLogin"
+      :disabled="loading"
+      class="google-button"
+    >
+      <svg class="google-icon" viewBox="0 0 24 24" width="20" height="20">
+        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+      </svg>
+      <span>Continue with Google</span>
+    </button>
+
     <div class="auth-links">
-      <router-link to="/register" class="auth-link">Don't have an account? Register</router-link>
-      <router-link to="/forgot-password" class="auth-link">Forgot password?</router-link>
+      <router-link to="/auth/register" class="auth-link">Don't have an account? Register</router-link>
+      <router-link to="/auth/forgot-password" class="auth-link">Forgot password?</router-link>
     </div>
 
     <div v-if="isLoggedIn" class="success-message">
@@ -60,8 +96,9 @@
 </template>
 
 <script setup>
-import { ref, computed, reactive } from 'vue'
+import { ref, computed, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { supabase } from '../../lib/supabaseClient.js'
 
 const router = useRouter()
 
@@ -75,6 +112,7 @@ const formData = reactive({
 const loading = ref(false)
 const errorMessage = ref('')
 const isLoggedIn = ref(false)
+const showPassword = ref(false)
 const errors = reactive({
   email: '',
   password: ''
@@ -129,14 +167,17 @@ const handleLogin = async () => {
   loading.value = true
 
   try {
-    // Simulate API call - Replace this with your actual API endpoint
-    const response = await mockLogin(formData.email, formData.password)
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: formData.email,
+      password: formData.password
+    })
     
-    if (response.success) {
-      // Store authentication token (in real app, use secure storage)
-      localStorage.setItem('authToken', response.token)
-      localStorage.setItem('user', JSON.stringify(response.user))
-      
+    if (error) {
+      errorMessage.value = error.message || 'Login failed. Please check your credentials.'
+      return
+    }
+    
+    if (data.user) {
       isLoggedIn.value = true
       errorMessage.value = ''
       
@@ -146,8 +187,6 @@ const handleLogin = async () => {
       
       // Redirect to main app
       router.push('/home')
-    } else {
-      errorMessage.value = response.message || 'Login failed. Please check your credentials.'
     }
   } catch (error) {
     errorMessage.value = error.message || 'An error occurred. Please try again.'
@@ -157,60 +196,61 @@ const handleLogin = async () => {
   }
 }
 
-// Mock login function - Replace with actual API call
-const mockLogin = (email, password) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // Mock validation - Replace with actual API call
-      if (email === 'admin@example.com' && password === 'password123') {
-        resolve({
-          success: true,
-          token: 'mock-jwt-token-' + Date.now(),
-          user: {
-            id: 1,
-            email: email,
-            name: 'Admin User'
-          }
-        })
-      } else if (email === 'user@example.com' && password === 'password123') {
-        resolve({
-          success: true,
-          token: 'mock-jwt-token-' + Date.now(),
-          user: {
-            id: 2,
-            email: email,
-            name: 'Regular User'
-          }
-        })
-      } else {
-        resolve({
-          success: false,
-          message: 'Invalid email or password'
-        })
+// Google OAuth login
+const handleGoogleLogin = async () => {
+  loading.value = true
+  errorMessage.value = ''
+
+  try {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/home`
       }
-    }, 1000) // Simulate network delay
-  })
+    })
+    
+    if (error) {
+      errorMessage.value = error.message || 'Failed to sign in with Google.'
+      loading.value = false
+    }
+    // Note: User will be redirected to Google, so we don't need to handle success here
+  } catch (error) {
+    errorMessage.value = error.message || 'An error occurred. Please try again.'
+    console.error('Google login error:', error)
+    loading.value = false
+  }
 }
 
 // Logout logic
-const handleLogout = () => {
-  localStorage.removeItem('authToken')
-  localStorage.removeItem('user')
+const handleLogout = async () => {
+  await supabase.auth.signOut()
   isLoggedIn.value = false
   errorMessage.value = ''
-  router.push('/')
+  router.push('/auth/login')
 }
 
 // Check if user is already logged in on mount
-const checkAuthStatus = () => {
-  const token = localStorage.getItem('authToken')
-  if (token) {
+const checkAuthStatus = async () => {
+  const { data: { session } } = await supabase.auth.getSession()
+  if (session) {
     isLoggedIn.value = true
   }
 }
 
 // Initialize
-checkAuthStatus()
+onMounted(() => {
+  checkAuthStatus()
+  
+  // Listen for auth state changes
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' && session) {
+      isLoggedIn.value = true
+      router.push('/home')
+    } else if (event === 'SIGNED_OUT') {
+      isLoggedIn.value = false
+    }
+  })
+})
 </script>
 
 <style scoped>
@@ -275,6 +315,46 @@ label {
 
 .form-input.error {
   border-color: #e74c3c;
+}
+
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-wrapper .form-input {
+  padding-right: 3rem;
+  width: 100%;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  transition: color 0.3s ease;
+  z-index: 1;
+}
+
+.password-toggle:hover:not(:disabled) {
+  color: #667eea;
+}
+
+.password-toggle:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.password-toggle svg {
+  width: 20px;
+  height: 20px;
 }
 
 .error-message {
@@ -346,6 +426,63 @@ label {
   to { transform: rotate(360deg); }
 }
 
+.divider {
+  margin: 1.5rem 0;
+  display: flex;
+  align-items: center;
+  text-align: center;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.divider span {
+  padding: 0 1rem;
+  color: #666;
+  font-size: 0.9rem;
+  background-color: rgba(255, 255, 255, 0.95);
+}
+
+.google-button {
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  background: white;
+  color: #3c4043;
+  border: 1px solid #dadce0;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.google-button:hover:not(:disabled) {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border-color: #c8ccd0;
+}
+
+.google-button:active:not(:disabled) {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.google-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.google-icon {
+  flex-shrink: 0;
+}
+
 .auth-links {
   margin-top: 1.5rem;
   display: flex;
@@ -413,6 +550,34 @@ label {
 
   .form-input:focus {
     border-color: #667eea;
+  }
+
+  .password-toggle {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .password-toggle:hover:not(:disabled) {
+    color: #667eea;
+  }
+
+  .divider::before,
+  .divider::after {
+    border-bottom-color: #333;
+  }
+
+  .divider span {
+    color: rgba(255, 255, 255, 0.6);
+    background-color: rgba(26, 26, 26, 0.95);
+  }
+
+  .google-button {
+    background: #1a1a1a;
+    color: rgba(255, 255, 255, 0.87);
+    border-color: #333;
+  }
+
+  .google-button:hover:not(:disabled) {
+    border-color: #444;
   }
 
   .error-banner {
