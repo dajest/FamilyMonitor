@@ -1,6 +1,7 @@
-import { ref, onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from '../../lib/supabaseClient.js'
+import { useUserStore } from '../../stores/user.js'
 
 /**
  * Composable for authentication management in components
@@ -8,43 +9,22 @@ import { supabase } from '../../lib/supabaseClient.js'
  */
 export function useAuth() {
   const router = useRouter()
-  const user = ref(null)
+  const userStore = useUserStore()
   let authSubscription = null
-
-  const normalizeUser = (sessionUser) => {
-    if (!sessionUser) return null
-    
-    return {
-      email: sessionUser.email,
-      name: sessionUser.user_metadata?.full_name || 
-            sessionUser.user_metadata?.name || 
-            sessionUser.user_metadata?.display_name ||
-            sessionUser.email?.split('@')[0] ||
-            sessionUser.email,
-      id: sessionUser.id
-    }
-  }
-
-  const loadUser = async () => {
-    const { data: { session } } = await supabase.auth.getSession()
-    
-    if (session?.user) {
-      user.value = normalizeUser(session.user)
-    }
-  }
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
+    userStore.clearUser()
     router.push('/auth/login')
   }
 
   const setupAuthListener = () => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_OUT' || !session) {
-        user.value = null
+        userStore.clearUser()
         router.push('/auth/login')
       } else if (session?.user) {
-        user.value = normalizeUser(session.user)
+        await userStore.loadUser()
       }
     })
     
@@ -52,7 +32,7 @@ export function useAuth() {
   }
 
   onMounted(async () => {
-    await loadUser()
+    await userStore.loadUser()
     setupAuthListener()
   })
 
@@ -63,8 +43,8 @@ export function useAuth() {
   })
 
   return {
-    user,
+    user: computed(() => userStore.user),
     handleLogout,
-    loadUser
+    loadUser: userStore.loadUser
   }
 }

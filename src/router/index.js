@@ -7,6 +7,7 @@ import ForgotPassword from '../pages/auth/ForgotPassword.vue'
 import ChangePassword from '../pages/auth/ChangePassword.vue'
 import ResetPassword from '../pages/auth/ResetPassword.vue'
 import Home from '../pages/app/Home.vue'
+import Profile from '../pages/app/profile/Profile.vue'
 import { requireAuth, requireGuest } from '../middleware/auth'
 
 const routes = [
@@ -55,6 +56,11 @@ const routes = [
         path: '',
         name: 'Home',
         component: Home
+      },
+      {
+        path: 'profile',
+        name: 'Profile',
+        component: Profile
       }
     ]
   }
@@ -67,7 +73,6 @@ const router = createRouter({
 
 // Navigation guard for protected routes
 router.beforeEach(async (to, from, next) => {
-  // Allow reset-password page without auth (user comes from email link)
   if (to.path === '/auth/reset-password' && to.meta.allowWithoutAuth) {
     next()
     return
@@ -75,13 +80,10 @@ router.beforeEach(async (to, from, next) => {
   
   // Check if route is an auth page (login, register, etc.)
   if (to.path.startsWith('/auth')) {
-    // Redirect authenticated users away from auth pages (including reset-password)
-    // Unauthenticated users can access auth pages (e.g., reset-password from email link)
     await requireGuest(next, '/home')
   } 
   // Check if route requires authentication
   else if (to.meta.requiresAuth || to.path.startsWith('/home')) {
-    // Protect the route - redirect to login if not authenticated
     await requireAuth(next, '/auth/login')
   } 
   else {

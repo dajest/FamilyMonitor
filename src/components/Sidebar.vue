@@ -1,13 +1,11 @@
 <template>
   <div>
-    <!-- Overlay for sidebar -->
     <div 
       v-if="isOpen" 
       class="sidebar-overlay"
       @click="$emit('close')"
     ></div>
     
-    <!-- Sidebar -->
     <aside 
       class="sidebar"
       :class="{ 'sidebar-open': isOpen }"
@@ -31,7 +29,7 @@
           <Icon name="home" size="20" />
           <span>{{ $t('sidebar.home') }}</span>
         </router-link>
-        <!-- Add more navigation items here -->
+
       </nav>
     </aside>
   </div>
@@ -49,7 +47,6 @@ defineProps({
 
 defineEmits(['close'])
 
-// i18n is available via $t in template (globalInjection: true)
 </script>
 
 <style lang="scss" scoped>
@@ -157,7 +154,6 @@ defineEmits(['close'])
   }
 }
 
-// Light theme styles
 [data-theme="light"],
 :root:not([data-theme="dark"]) {
   .sidebar-overlay {

@@ -1,16 +1,16 @@
 <template>
   <div class="change-password-card">
-    <h2>Change Password</h2>
+    <h2>{{ $t('auth.changePassword.title') }}</h2>
     
     <form @submit.prevent="handleChangePassword" class="change-password-form">
       <div class="form-group">
-        <label for="newPassword">New Password</label>
+        <label for="newPassword">{{ $t('auth.changePassword.newPassword') }}</label>
         <div class="password-input-wrapper">
           <input
             id="newPassword"
             v-model="formData.newPassword"
             :type="showPassword ? 'text' : 'password'"
-            placeholder="Enter your new password"
+            :placeholder="$t('auth.changePassword.newPasswordPlaceholder')"
             required
             :disabled="loading"
             class="form-input"
@@ -31,13 +31,13 @@
       </div>
 
       <div class="form-group">
-        <label for="confirmPassword">Confirm New Password</label>
+        <label for="confirmPassword">{{ $t('auth.changePassword.confirmPassword') }}</label>
         <div class="password-input-wrapper">
           <input
             id="confirmPassword"
             v-model="formData.confirmPassword"
             :type="showConfirmPassword ? 'text' : 'password'"
-            placeholder="Confirm your new password"
+            :placeholder="$t('auth.changePassword.confirmPasswordPlaceholder')"
             required
             :disabled="loading"
             class="form-input"
@@ -71,13 +71,13 @@
         class="submit-button"
         :class="{ 'loading': loading }"
       >
-        <span v-if="loading">Changing Password...</span>
-        <span v-else>Change Password</span>
+        <span v-if="loading">{{ $t('auth.changePassword.changingPassword') }}</span>
+        <span v-else>{{ $t('auth.changePassword.changePasswordButton') }}</span>
       </button>
     </form>
 
     <div class="auth-links">
-      <router-link to="/auth/login" class="auth-link">Back to Login</router-link>
+      <router-link to="/auth/login" class="auth-link">{{ $t('auth.changePassword.backToLogin') }}</router-link>
     </div>
   </div>
 </template>
@@ -85,10 +85,12 @@
 <script setup>
 import { ref, computed, reactive } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { supabase } from '../../lib/supabaseClient.js'
 import Icon from '../../components/Icon.vue'
 
 const router = useRouter()
+const { t } = useI18n()
 
 const formData = reactive({
   newPassword: '',
@@ -106,14 +108,14 @@ const errors = reactive({
 })
 
 const validatePassword = (password) => {
-  if (!password) return 'Password is required'
-  if (password.length < 6) return 'Password must be at least 6 characters'
+  if (!password) return t('auth.changePassword.passwordRequired')
+  if (password.length < 6) return t('auth.changePassword.passwordMinLength')
   return ''
 }
 
 const validateConfirmPassword = (password, confirmPassword) => {
-  if (!confirmPassword) return 'Please confirm your password'
-  if (password !== confirmPassword) return 'Passwords do not match'
+  if (!confirmPassword) return t('auth.changePassword.pleaseConfirmPassword')
+  if (password !== confirmPassword) return t('auth.changePassword.passwordsDoNotMatch')
   return ''
 }
 
@@ -144,11 +146,11 @@ const handleChangePassword = async () => {
     })
     
     if (error) {
-      errorMessage.value = error.message || 'Failed to change password. Please try again.'
+      errorMessage.value = error.message || t('auth.changePassword.failedToChangePassword')
       return
     }
     
-    successMessage.value = 'Password changed successfully!'
+    successMessage.value = t('auth.changePassword.passwordChangedSuccessfully')
     formData.newPassword = ''
     formData.confirmPassword = ''
     
@@ -157,7 +159,7 @@ const handleChangePassword = async () => {
       router.push('/auth/login')
     }, 2000)
   } catch (error) {
-    errorMessage.value = error.message || 'An error occurred. Please try again.'
+    errorMessage.value = error.message || t('auth.changePassword.errorOccurred')
     console.error('Change password error:', error)
   } finally {
     loading.value = false

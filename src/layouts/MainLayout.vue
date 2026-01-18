@@ -7,7 +7,6 @@
     
     <Header
       :title="title"
-      :user="user"
       :theme="theme"
       @toggleSidebar="toggleSidebar"
       @toggleTheme="toggleTheme"
@@ -35,7 +34,7 @@ const title = computed(() => t('common.mainApp'))
 // Use composables
 const { theme, toggleTheme } = useTheme()
 const { isSidebarOpen, toggleSidebar, closeSidebar } = useSidebar()
-const { user, handleLogout } = useAuth()
+const { handleLogout } = useAuth()
 </script>
 
 <style lang="scss" scoped>

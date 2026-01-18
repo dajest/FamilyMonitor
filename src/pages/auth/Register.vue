@@ -1,29 +1,28 @@
 <template>
   <div class="register-card">
-    <h2>Register</h2>
+    <h2>{{ $t('auth.register.title') }}</h2>
     <form @submit.prevent="handleRegister" class="register-form">
-      <div class="form-group">
-        <label for="name">Full Name</label>
+      <div class="form-group title">
+        <label for="title">{{ $t('auth.register.churchName') }}</label>
         <input
-          id="name"
-          v-model="formData.name"
+          id="title"
+          v-model="formData.title"
           type="text"
-          placeholder="Enter your full name"
-          required
+          :placeholder="$t('auth.register.churchNamePlaceholder')"
           :disabled="loading"
           class="form-input"
-          :class="{ 'error': errors.name }"
+          :class="{ 'error': errors.title }"
         />
-        <span v-if="errors.name" class="error-message">{{ errors.name }}</span>
+        <span v-if="errors.title" class="error-message">{{ errors.title }}</span>
       </div>
 
       <div class="form-group">
-        <label for="email">Email</label>
+        <label for="email">{{ $t('auth.register.email') }}</label>
         <input
           id="email"
           v-model="formData.email"
           type="email"
-          placeholder="Enter your email"
+          :placeholder="$t('auth.register.emailPlaceholder')"
           required
           :disabled="loading"
           class="form-input"
@@ -33,13 +32,13 @@
       </div>
 
       <div class="form-group">
-        <label for="password">Password</label>
+        <label for="password">{{ $t('auth.register.password') }}</label>
         <div class="password-input-wrapper">
           <input
             id="password"
             v-model="formData.password"
             :type="showPassword ? 'text' : 'password'"
-            placeholder="Enter your password"
+            :placeholder="$t('auth.register.passwordPlaceholder')"
             required
             :disabled="loading"
             class="form-input"
@@ -60,13 +59,13 @@
       </div>
 
       <div class="form-group">
-        <label for="confirmPassword">Confirm Password</label>
+        <label for="confirmPassword">{{ $t('auth.register.confirmPassword') }}</label>
         <div class="password-input-wrapper">
           <input
             id="confirmPassword"
             v-model="formData.confirmPassword"
             :type="showConfirmPassword ? 'text' : 'password'"
-            placeholder="Confirm your password"
+            :placeholder="$t('auth.register.confirmPasswordPlaceholder')"
             required
             :disabled="loading"
             class="form-input"
@@ -100,13 +99,13 @@
         class="register-button"
         :class="{ 'loading': loading }"
       >
-        <span v-if="loading">Registering...</span>
-        <span v-else>Register</span>
+        <span v-if="loading">{{ $t('auth.register.registering') }}</span>
+        <span v-else>{{ $t('auth.register.registerButton') }}</span>
       </button>
     </form>
 
     <div class="divider">
-      <span>OR</span>
+      <span>{{ $t('auth.register.or') }}</span>
     </div>
 
     <button
@@ -115,11 +114,11 @@
       class="google-button"
     >
       <Icon name="google" size="20" class="google-icon" />
-      <span>Continue with Google</span>
+      <span>{{ $t('auth.register.continueWithGoogle') }}</span>
     </button>
 
     <div class="auth-links">
-      <router-link to="/auth/login" class="auth-link">Already have an account? Login</router-link>
+      <router-link to="/auth/login" class="auth-link">{{ $t('auth.register.alreadyHaveAccount') }}</router-link>
     </div>
   </div>
 </template>
@@ -127,13 +126,15 @@
 <script setup>
 import { ref, computed, reactive, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { supabase } from '../../lib/supabaseClient.js'
 import Icon from '../../components/Icon.vue'
 
 const router = useRouter()
+const { t } = useI18n()
 
 const formData = reactive({
-  name: '',
+  title: '',
   email: '',
   password: '',
   confirmPassword: ''
@@ -145,59 +146,49 @@ const successMessage = ref('')
 const showPassword = ref(false)
 const showConfirmPassword = ref(false)
 const errors = reactive({
-  name: '',
+  title: '',
   email: '',
   password: '',
   confirmPassword: ''
 })
 
-const validateName = (name) => {
-  if (!name) return 'Name is required'
-  if (name.length < 2) return 'Name must be at least 2 characters'
-  return ''
-}
-
 const validateEmail = (email) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  if (!email) return 'Email is required'
-  if (!emailRegex.test(email)) return 'Please enter a valid email address'
+  if (!email) return t('auth.register.emailRequired')
+  if (!emailRegex.test(email)) return t('auth.register.emailInvalid')
   return ''
 }
 
 const validatePassword = (password) => {
-  if (!password) return 'Password is required'
-  if (password.length < 6) return 'Password must be at least 6 characters'
+  if (!password) return t('auth.register.passwordRequired')
+  if (password.length < 6) return t('auth.register.passwordMinLength')
   return ''
 }
 
 const validateConfirmPassword = (password, confirmPassword) => {
   if (!confirmPassword) return ''
-  if (password !== confirmPassword) return 'Passwords do not match'
+  if (password !== confirmPassword) return t('auth.register.passwordsDoNotMatch')
   return ''
 }
 
 const isFormValid = computed(() => {
-  return formData.name &&
-         formData.email &&
+  return formData.email &&
          formData.password &&
          formData.confirmPassword &&
-         !errors.name &&
          !errors.email &&
          !errors.password &&
-         !errors.confirmPassword
+         !errors.confirmPassword &&
+         !errors.title
 })
 
 const validateForm = () => {
-  errors.name = validateName(formData.name)
   errors.email = validateEmail(formData.email)
   errors.password = validatePassword(formData.password)
   errors.confirmPassword = validateConfirmPassword(formData.password, formData.confirmPassword)
 }
 
-// Real-time validation for password fields
 watch(() => formData.password, () => {
   errors.password = validatePassword(formData.password)
-  // Re-validate confirm password when password changes
   if (formData.confirmPassword) {
     errors.confirmPassword = validateConfirmPassword(formData.password, formData.confirmPassword)
   }
@@ -206,13 +197,6 @@ watch(() => formData.password, () => {
 watch(() => formData.confirmPassword, () => {
   if (formData.confirmPassword || errors.confirmPassword) {
     errors.confirmPassword = validateConfirmPassword(formData.password, formData.confirmPassword)
-  }
-})
-
-// Real-time validation for other fields
-watch(() => formData.name, () => {
-  if (formData.name || errors.name) {
-    errors.name = validateName(formData.name)
   }
 })
 
@@ -232,36 +216,52 @@ const handleRegister = async () => {
   loading.value = true
 
   try {
-    const { data, error } = await supabase.auth.signUp({
+    const { data: authData, error: authError } = await supabase.auth.signUp({
       email: formData.email,
       password: formData.password,
       options: {
         data: {
-          full_name: formData.name
+          title: formData.title || null
         }
       }
     })
     
-    if (error) {
-      errorMessage.value = error.message || 'Registration failed. Please try again.'
+    if (authError) {
+      errorMessage.value = authError.message || t('auth.register.registrationFailed')
       return
     }
     
-    if (data.user) {
-      successMessage.value = 'Registration successful! Please check your email to verify your account. Redirecting to login...'
+    if (authData.user) {
+      const { data: churchData, error: churchError } = await supabase
+        .from('churches')
+        .insert([
+          {
+            UID: authData.user.id,
+            email: formData.email || null,
+            title: formData.title || null
+          }
+        ])
+        .select()
+      
+      if (churchError) {
+        console.error('Error creating church record:', churchError)
+        errorMessage.value = t('auth.register.userCreatedButFailed')
+        return
+      }
+      
+      successMessage.value = t('auth.register.registrationSuccessful')
       setTimeout(() => {
         router.push('/auth/login')
       }, 3000)
     }
   } catch (error) {
-    errorMessage.value = error.message || 'An error occurred. Please try again.'
+    errorMessage.value = error.message || t('auth.register.errorOccurred')
     console.error('Registration error:', error)
   } finally {
     loading.value = false
   }
 }
 
-// Google OAuth registration/login
 const handleGoogleLogin = async () => {
   loading.value = true
   errorMessage.value = ''
@@ -276,12 +276,11 @@ const handleGoogleLogin = async () => {
     })
     
     if (error) {
-      errorMessage.value = error.message || 'Failed to sign in with Google.'
+      errorMessage.value = error.message || t('auth.register.failedToSignInWithGoogle')
       loading.value = false
     }
-    // Note: User will be redirected to Google, so we don't need to handle success here
   } catch (error) {
-    errorMessage.value = error.message || 'An error occurred. Please try again.'
+    errorMessage.value = error.message || t('auth.register.errorOccurred')
     console.error('Google login error:', error)
     loading.value = false
   }

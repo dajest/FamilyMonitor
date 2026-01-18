@@ -55,10 +55,9 @@
             @mousedown.prevent
           >
             <div class="dropdown-header">
-              <div class="user-name">{{ user.name }}</div>
-              <div class="user-email">{{ user.email }}</div>
+              <div class="user-name">{{ user?.pastorsName || user?.name || '' }}</div>
+              <div class="user-email">{{ user?.churchName || user?.email || '' }}</div>
             </div>
-            <div class="dropdown-divider"></div>
             <button @click="goToProfile" class="dropdown-item">
               <Icon name="user" size="18" />
               <span>{{ $t('common.profile') }}</span>
@@ -81,7 +80,9 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { useUserStore } from '../stores/user.js'
 import { useLanguage } from '../layouts/composables/useLanguage.js'
 import Icon from './Icon.vue'
 
@@ -90,18 +91,18 @@ const props = defineProps({
     type: String,
     default: 'Main App'
   },
-  user: {
-    type: Object,
-    default: null
-  },
   theme: {
     type: String,
     default: 'light'
   }
 })
 
+const userStore = useUserStore()
+const user = computed(() => userStore.user)
+
 const emit = defineEmits(['toggleSidebar', 'toggleTheme', 'logout', 'changeLanguage'])
 
+const router = useRouter()
 const { t } = useI18n()
 const { currentLanguage, languages, setLanguage } = useLanguage()
 const isDropdownOpen = ref(false)
@@ -113,7 +114,6 @@ const toggleDropdown = () => {
 }
 
 const handleBlur = (event) => {
-  // Delay closing to allow click events on dropdown items
   const target = event.currentTarget
   setTimeout(() => {
     if (target && !target.contains(document.activeElement)) {
@@ -128,7 +128,6 @@ const toggleLanguageDropdown = () => {
 }
 
 const handleLanguageBlur = (event) => {
-  // Delay closing to allow click events on dropdown items
   const target = event.currentTarget
   setTimeout(() => {
     if (target && !target.contains(document.activeElement)) {
@@ -139,7 +138,7 @@ const handleLanguageBlur = (event) => {
 
 const goToProfile = () => {
   isDropdownOpen.value = false
-  // TODO: Navigate to profile page when it's created
+  router.push('/home/profile')
 }
 
 const getFlag = (langCode) => {
@@ -171,7 +170,6 @@ const handleLogout = () => {
   emit('logout')
 }
 
-// Close dropdowns when clicking outside
 const handleClickOutside = (event) => {
   const profileDropdown = document.querySelector('.profile-dropdown')
   const languageDropdown = document.querySelector('.language-dropdown')
@@ -394,12 +392,6 @@ onUnmounted(() => {
   color: rgba(255, 255, 255, 0.6);
 }
 
-.dropdown-divider {
-  height: 1px;
-  background-color: #444;
-  margin: 0.5rem 0;
-}
-
 .dropdown-item {
   width: 100%;
   display: flex;
@@ -444,7 +436,6 @@ onUnmounted(() => {
   }
 }
 
-// Light theme styles
 [data-theme="light"],
 :root:not([data-theme="dark"]) {
   .main-header {
@@ -518,10 +509,6 @@ onUnmounted(() => {
 
   .user-email {
     color: #666;
-  }
-
-  .dropdown-divider {
-    background-color: #e0e0e0;
   }
 
   .dropdown-item {

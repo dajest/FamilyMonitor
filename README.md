@@ -1,5 +1,37 @@
-# Vue 3 + Vite
+# Family Care Agency
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+Vue 3 + Vite application for Family Care Agency.
 
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+## Setup
+
+1. Install dependencies:
+```bash
+npm install
+```
+
+2. Create a `.env.local` file in the root directory with the following variables:
+```env
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_KEY=your_supabase_key
+VITE_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
+```
+
+3. To get a Google Maps API key:
+   - Go to [Google Cloud Console](https://console.cloud.google.com/)
+   - Create a new project or select an existing one
+   - Enable the "Places API" and "Maps JavaScript API"
+   - Create credentials (API Key)
+   - Add the API key to your `.env.local` file
+
+4. Run the development server:
+```bash
+npm run dev
+```
+
+## Features
+
+- User authentication with Supabase
+- Google OAuth login
+- Multi-language support (English, Russian, Lithuanian)
+- Dark/Light theme toggle
+- Google Places address autocomplete in registration form

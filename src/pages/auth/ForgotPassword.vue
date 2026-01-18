@@ -1,16 +1,16 @@
 <template>
   <div class="forgot-password-card">
-    <h2>Forgot Password</h2>
-    <p class="description">Enter your email address and we'll send you a link to reset your password.</p>
+    <h2>{{ $t('auth.forgotPassword.title') }}</h2>
+    <p class="description">{{ $t('auth.forgotPassword.description') }}</p>
     
     <form @submit.prevent="handleForgotPassword" class="forgot-password-form">
       <div class="form-group">
-        <label for="email">Email</label>
+        <label for="email">{{ $t('auth.forgotPassword.email') }}</label>
         <input
           id="email"
           v-model="formData.email"
           type="email"
-          placeholder="Enter your email"
+          :placeholder="$t('auth.forgotPassword.emailPlaceholder')"
           required
           :disabled="loading"
           class="form-input"
@@ -33,20 +33,23 @@
         class="submit-button"
         :class="{ 'loading': loading }"
       >
-        <span v-if="loading">Sending...</span>
-        <span v-else>Send Reset Link</span>
+        <span v-if="loading">{{ $t('auth.forgotPassword.sending') }}</span>
+        <span v-else>{{ $t('auth.forgotPassword.sendResetLink') }}</span>
       </button>
     </form>
 
     <div class="auth-links">
-      <router-link to="/auth/login" class="auth-link">Back to Login</router-link>
+      <router-link to="/auth/login" class="auth-link">{{ $t('auth.forgotPassword.backToLogin') }}</router-link>
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, reactive } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { supabase } from '../../lib/supabaseClient.js'
+
+const { t } = useI18n()
 
 const formData = reactive({
   email: ''
@@ -61,8 +64,8 @@ const errors = reactive({
 
 const validateEmail = (email) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  if (!email) return 'Email is required'
-  if (!emailRegex.test(email)) return 'Please enter a valid email address'
+  if (!email) return t('auth.forgotPassword.emailRequired')
+  if (!emailRegex.test(email)) return t('auth.forgotPassword.emailInvalid')
   return ''
 }
 
@@ -81,14 +84,14 @@ const handleForgotPassword = async () => {
     })
     
     if (error) {
-      errorMessage.value = error.message || 'Failed to send reset link. Please try again.'
+      errorMessage.value = error.message || t('auth.forgotPassword.failedToSendResetLink')
       return
     }
     
-    successMessage.value = 'Password reset link has been sent to your email!'
+    successMessage.value = t('auth.forgotPassword.resetLinkSent')
     formData.email = ''
   } catch (error) {
-    errorMessage.value = error.message || 'An error occurred. Please try again.'
+    errorMessage.value = error.message || t('auth.forgotPassword.errorOccurred')
     console.error('Forgot password error:', error)
   } finally {
     loading.value = false

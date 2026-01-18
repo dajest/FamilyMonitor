@@ -1,14 +1,14 @@
 <template>
   <div class="login-card">
-    <h2>Login</h2>
+    <h2>{{ $t('auth.login.title') }}</h2>
     <form @submit.prevent="handleLogin" class="login-form">
       <div class="form-group">
-        <label for="email">Email</label>
+        <label for="email">{{ $t('auth.login.email') }}</label>
         <input
           id="email"
           v-model="formData.email"
           type="email"
-          placeholder="Enter your email"
+          :placeholder="$t('auth.login.emailPlaceholder')"
           required
           :disabled="loading"
           class="form-input"
@@ -18,13 +18,13 @@
       </div>
 
       <div class="form-group">
-        <label for="password">Password</label>
+        <label for="password">{{ $t('auth.login.password') }}</label>
         <div class="password-input-wrapper">
           <input
             id="password"
             v-model="formData.password"
             :type="showPassword ? 'text' : 'password'"
-            placeholder="Enter your password"
+            :placeholder="$t('auth.login.passwordPlaceholder')"
             required
             :disabled="loading"
             class="form-input"
@@ -54,13 +54,13 @@
         class="login-button"
         :class="{ 'loading': loading }"
       >
-        <span v-if="loading">Logging in...</span>
-        <span v-else>Login</span>
+        <span v-if="loading">{{ $t('auth.login.loggingIn') }}</span>
+        <span v-else>{{ $t('auth.login.loginButton') }}</span>
       </button>
     </form>
 
     <div class="divider">
-      <span>OR</span>
+      <span>{{ $t('auth.login.or') }}</span>
     </div>
 
     <button
@@ -69,17 +69,17 @@
       class="google-button"
     >
       <Icon name="google" size="20" class="google-icon" />
-      <span>Continue with Google</span>
+      <span>{{ $t('auth.login.continueWithGoogle') }}</span>
     </button>
 
     <div class="auth-links">
-      <router-link to="/auth/register" class="auth-link">Don't have an account? Register</router-link>
-      <router-link to="/auth/forgot-password" class="auth-link">Forgot password?</router-link>
+      <router-link to="/auth/register" class="auth-link">{{ $t('auth.login.dontHaveAccount') }}</router-link>
+      <router-link to="/auth/forgot-password" class="auth-link">{{ $t('auth.login.forgotPassword') }}</router-link>
     </div>
 
     <div v-if="isLoggedIn" class="success-message">
-      <p>✓ Successfully logged in!</p>
-      <button @click="handleLogout" class="logout-button">Logout</button>
+      <p>{{ $t('auth.login.successfullyLoggedIn') }}</p>
+      <button @click="handleLogout" class="logout-button">{{ $t('auth.login.logout') }}</button>
     </div>
   </div>
 </template>
@@ -87,10 +87,12 @@
 <script setup>
 import { ref, computed, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { supabase } from '../../lib/supabaseClient.js'
 import Icon from '../../components/Icon.vue'
 
 const router = useRouter()
+const { t } = useI18n()
 
 // Form data
 const formData = reactive({
@@ -112,20 +114,20 @@ const errors = reactive({
 const validateEmail = (email) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   if (!email) {
-    return 'Email is required'
+    return t('auth.login.emailRequired')
   }
   if (!emailRegex.test(email)) {
-    return 'Please enter a valid email address'
+    return t('auth.login.emailInvalid')
   }
   return ''
 }
 
 const validatePassword = (password) => {
   if (!password) {
-    return 'Password is required'
+    return t('auth.login.passwordRequired')
   }
   if (password.length < 6) {
-    return 'Password must be at least 6 characters'
+    return t('auth.login.passwordMinLength')
   }
   return ''
 }
@@ -163,7 +165,7 @@ const handleLogin = async () => {
     })
     
     if (error) {
-      errorMessage.value = error.message || 'Login failed. Please check your credentials.'
+      errorMessage.value = error.message || t('auth.login.loginFailed')
       return
     }
     
@@ -179,7 +181,7 @@ const handleLogin = async () => {
       router.push('/home')
     }
   } catch (error) {
-    errorMessage.value = error.message || 'An error occurred. Please try again.'
+    errorMessage.value = error.message || t('auth.login.errorOccurred')
     console.error('Login error:', error)
   } finally {
     loading.value = false
@@ -200,12 +202,12 @@ const handleGoogleLogin = async () => {
     })
     
     if (error) {
-      errorMessage.value = error.message || 'Failed to sign in with Google.'
+      errorMessage.value = error.message || t('auth.login.failedToSignInWithGoogle')
       loading.value = false
     }
     // Note: User will be redirected to Google, so we don't need to handle success here
   } catch (error) {
-    errorMessage.value = error.message || 'An error occurred. Please try again.'
+    errorMessage.value = error.message || t('auth.login.errorOccurred')
     console.error('Google login error:', error)
     loading.value = false
   }
