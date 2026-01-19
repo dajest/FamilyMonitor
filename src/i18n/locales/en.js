@@ -23,7 +23,8 @@ export default {
     menu: 'Menu',
     closeMenu: 'Close Menu',
     openMenu: 'Open Menu',
-    home: 'Home'
+    home: 'Home',
+    consultants: 'Consultants'
   },
   header: {
     openMenu: 'Open Menu',
@@ -163,5 +164,57 @@ export default {
   },
   googleAddress: {
     addressRequired: 'Address is required'
+  },
+  consultants: {
+    title: 'Consultants',
+    createButton: 'Create Consultant',
+    emptyState: 'No consultants found',
+    status: {
+      active: 'Active',
+      inactive: 'Inactive'
+    },
+    table: {
+      name: 'Name',
+      position: 'Position',
+      status: 'Status',
+      actions: 'Actions',
+      edit: 'Edit'
+    },
+    modal: {
+      createTitle: 'Create Consultant',
+      editTitle: 'Edit Consultant',
+      cancel: 'Cancel',
+      save: 'Save'
+    },
+    form: {
+      name: 'Name',
+      namePlaceholder: 'Enter consultant name',
+      position: 'Position',
+      positionPlaceholder: 'Enter position',
+      status: 'Status'
+    },
+    create: {
+      title: 'Create Consultant',
+      back: 'Back',
+      cancel: 'Cancel',
+      save: 'Save',
+      saving: 'Saving...'
+    },
+    edit: {
+      title: 'Edit Consultant',
+      back: 'Back',
+      cancel: 'Cancel',
+      save: 'Save',
+      saving: 'Saving...',
+      loading: 'Loading consultant data...'
+    },
+    view: {
+      title: 'Consultant Details',
+      back: 'Back',
+      backToConsultantsList: 'Back to Consultants List',
+      edit: 'Edit',
+      loading: 'Loading consultant data...'
+    },
+    loading: 'Loading consultants...'
   }
 }

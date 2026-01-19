@@ -233,7 +233,7 @@ onMounted(() => {
 
 <style scoped>
 .profile-page {
-  max-width: 800px;
+  max-width: 1440px;
   margin: 0 auto;
 }
 
@@ -532,7 +532,6 @@ label {
   }
 }
 
-/* Modal styles */
 .modal-overlay {
   position: fixed;
   top: 0;

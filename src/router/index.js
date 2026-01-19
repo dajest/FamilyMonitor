@@ -8,6 +8,10 @@ import ChangePassword from '../pages/auth/ChangePassword.vue'
 import ResetPassword from '../pages/auth/ResetPassword.vue'
 import Home from '../pages/app/Home.vue'
 import Profile from '../pages/app/profile/Profile.vue'
+import Consultants from '../pages/app/Consultants.vue'
+import CreateConsultant from '../pages/app/CreateConsultant.vue'
+import ViewConsultant from '../pages/app/ViewConsultant.vue'
+import EditConsultant from '../pages/app/EditConsultant.vue'
 import { requireAuth, requireGuest } from '../middleware/auth'
 
 const routes = [
@@ -56,11 +60,45 @@ const routes = [
         path: '',
         name: 'Home',
         component: Home
-      },
+      }
+    ]
+  },
+  {
+    path: '/profile',
+    component: MainLayout,
+    meta: { requiresAuth: true },
+    children: [
       {
-        path: 'profile',
+        path: '',
         name: 'Profile',
         component: Profile
+      }
+    ]
+  },
+  {
+    path: '/consultants',
+    component: MainLayout,
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: '',
+        name: 'Consultants',
+        component: Consultants
+      },
+      {
+        path: 'create-consultant',
+        name: 'CreateConsultant',
+        component: CreateConsultant
+      },
+      {
+        path: 'edit-consultant/:id',
+        name: 'EditConsultant',
+        component: EditConsultant
+      },
+      {
+        path: ':id',
+        name: 'ViewConsultant',
+        component: ViewConsultant
       }
     ]
   }
@@ -83,7 +121,7 @@ router.beforeEach(async (to, from, next) => {
     await requireGuest(next, '/home')
   } 
   // Check if route requires authentication
-  else if (to.meta.requiresAuth || to.path.startsWith('/home')) {
+  else if (to.meta.requiresAuth || to.path.startsWith('/home') || to.path.startsWith('/consultants') || to.path.startsWith('/profile')) {
     await requireAuth(next, '/auth/login')
   } 
   else {

@@ -23,7 +23,8 @@ export default {
     menu: 'Меню',
     closeMenu: 'Закрыть меню',
     openMenu: 'Открыть меню',
-    home: 'Главная'
+    home: 'Главная',
+    consultants: 'Консультанты'
   },
   header: {
     openMenu: 'Открыть меню',
@@ -163,5 +164,57 @@ export default {
   },
   googleAddress: {
     addressRequired: 'Адрес обязателен'
+  },
+  consultants: {
+    title: 'Консультанты',
+    createButton: 'Создать консультанта',
+    emptyState: 'Консультанты не найдены',
+    status: {
+      active: 'Активен',
+      inactive: 'Неактивен'
+    },
+    table: {
+      name: 'Имя',
+      position: 'Должность',
+      status: 'Статус',
+      actions: 'Действия',
+      edit: 'Редактировать'
+    },
+    modal: {
+      createTitle: 'Создать консультанта',
+      editTitle: 'Редактировать консультанта',
+      cancel: 'Отмена',
+      save: 'Сохранить'
+    },
+    form: {
+      name: 'Имя',
+      namePlaceholder: 'Введите имя консультанта',
+      position: 'Должность',
+      positionPlaceholder: 'Введите должность',
+      status: 'Статус'
+    },
+    create: {
+      title: 'Создать консультанта',
+      back: 'Назад',
+      cancel: 'Отмена',
+      save: 'Сохранить',
+      saving: 'Сохранение...'
+    },
+    edit: {
+      title: 'Редактировать консультанта',
+      back: 'Назад',
+      cancel: 'Отмена',
+      save: 'Сохранить',
+      saving: 'Сохранение...',
+      loading: 'Загрузка данных консультанта...'
+    },
+    view: {
+      title: 'Данные консультанта',
+      back: 'Назад',
+      backToConsultantsList: 'Вернуться к списку консультантов',
+      edit: 'Редактировать',
+      loading: 'Загрузка данных консультанта...'
+    },
+    loading: 'Загрузка консультантов...'
   }
 }

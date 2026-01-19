@@ -11,11 +11,6 @@ export const useUserStore = defineStore('user', () => {
     
     const userData = {
       email: sessionUser.email,
-      name: sessionUser.user_metadata?.full_name || 
-            sessionUser.user_metadata?.name || 
-            sessionUser.user_metadata?.display_name ||
-            sessionUser.email?.split('@')[0] ||
-            sessionUser.email,
       id: sessionUser.id,
       pastorsName: '',
       churchName: ''

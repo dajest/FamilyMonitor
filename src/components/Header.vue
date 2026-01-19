@@ -55,7 +55,7 @@
             @mousedown.prevent
           >
             <div class="dropdown-header">
-              <div class="user-name">{{ user?.pastorsName || user?.name || '' }}</div>
+              <div class="user-name">{{ user?.pastorsName || '' }}</div>
               <div class="user-email">{{ user?.churchName || user?.email || '' }}</div>
             </div>
             <button @click="goToProfile" class="dropdown-item">
@@ -138,7 +138,7 @@ const handleLanguageBlur = (event) => {
 
 const goToProfile = () => {
   isDropdownOpen.value = false
-  router.push('/home/profile')
+  router.push('/profile')
 }
 
 const getFlag = (langCode) => {

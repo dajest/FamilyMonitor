@@ -23,7 +23,8 @@ export default {
     menu: 'Meniu',
     closeMenu: 'Uždaryti meniu',
     openMenu: 'Atidaryti meniu',
-    home: 'Pagrindinis'
+    home: 'Pagrindinis',
+    consultants: 'Konsultantai'
   },
   header: {
     openMenu: 'Atidaryti meniu',
@@ -163,5 +164,57 @@ export default {
   },
   googleAddress: {
     addressRequired: 'Adresas yra privalomas'
+  },
+  consultants: {
+    title: 'Konsultantai',
+    createButton: 'Sukurti konsultantą',
+    emptyState: 'Konsultantų nerasta',
+    status: {
+      active: 'Aktyvus',
+      inactive: 'Neaktyvus'
+    },
+    table: {
+      name: 'Vardas',
+      position: 'Pareigos',
+      status: 'Būsena',
+      actions: 'Veiksmai',
+      edit: 'Redaguoti'
+    },
+    modal: {
+      createTitle: 'Sukurti konsultantą',
+      editTitle: 'Redaguoti konsultantą',
+      cancel: 'Atšaukti',
+      save: 'Išsaugoti'
+    },
+    form: {
+      name: 'Vardas',
+      namePlaceholder: 'Įveskite konsultanto vardą',
+      position: 'Pareigos',
+      positionPlaceholder: 'Įveskite pareigas',
+      status: 'Būsena'
+    },
+    create: {
+      title: 'Sukurti konsultantą',
+      back: 'Atgal',
+      cancel: 'Atšaukti',
+      save: 'Išsaugoti',
+      saving: 'Išsaugoma...'
+    },
+    edit: {
+      title: 'Redaguoti konsultantą',
+      back: 'Atgal',
+      cancel: 'Atšaukti',
+      save: 'Išsaugoti',
+      saving: 'Išsaugoma...',
+      loading: 'Įkeliami konsultanto duomenys...'
+    },
+    view: {
+      title: 'Konsultanto duomenys',
+      back: 'Atgal',
+      backToConsultantsList: 'Grįžti į konsultantų sąrašą',
+      edit: 'Redaguoti',
+      loading: 'Įkeliami konsultanto duomenys...'
+    },
+    loading: 'Įkeliami konsultantai...'
   }
 }

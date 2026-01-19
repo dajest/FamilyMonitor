@@ -29,6 +29,14 @@
           <Icon name="home" size="20" />
           <span>{{ $t('sidebar.home') }}</span>
         </router-link>
+        <router-link 
+          to="/consultants" 
+          class="sidebar-nav-item"
+          @click="$emit('close')"
+        >
+          <Icon name="user" size="20" />
+          <span>{{ $t('sidebar.consultants') }}</span>
+        </router-link>
 
       </nav>
     </aside>

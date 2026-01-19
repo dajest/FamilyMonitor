@@ -11,7 +11,7 @@
 
 <style lang="scss" scoped>
 .home-page {
-  max-width: 800px;
+  max-width: 1440px;
   margin: 0 auto;
 
   h2 {
@@ -25,7 +25,6 @@
   }
 }
 
-// Light theme styles
 [data-theme="light"],
 :root:not([data-theme="dark"]) {
   .home-page {
